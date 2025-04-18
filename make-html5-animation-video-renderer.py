@@ -27,6 +27,15 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
+    "renderer",
+    action="store",
+    metavar="render.js path",
+    type=str,
+    help="""
+    Path to the render.js of the html5-animation-video-renderer repositoryyour
+    """,
+)
+parser.add_argument(
     "project",
     action="store",
     metavar="Project folder",
@@ -180,6 +189,13 @@ def error(str):
 if not args.project:
     error("The Path to your project with HTML files is a required argument")
 
+if not args.renderer:
+    error(
+        "The path to the html5-animation-video-renderer render.js file is a required argument"
+    )
+if not os.path.exists(args.renderer):
+    error("The render.js file does not exist")
+
 if (
     not args.debug
     and not args.pause
@@ -295,7 +311,8 @@ def enqueue_job(event):
 
     if platform.system() in ["Darwin", "Linux"]:
         run(
-            r"node /opt/html5-animation-video-renderer/render.js --video={locationpath} --url='{project_url}'",
+            r"node {renderer} --video={locationpath} --url='{project_url}'",
+            renderer=args.renderer,
             locationpath=intermediate_clip,
             project_url=project_url,
         )
